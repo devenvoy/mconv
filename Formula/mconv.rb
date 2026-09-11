@@ -7,7 +7,7 @@ class Mconv < Formula
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/devenvoy/mconv/releases/download/v2.0.0/mconv-v2.0.0-macos-arm64.tar.gz"
-      sha256 "0280127e41ea22183116440ece96bd60b64d4da5f8bb7b6ea10731bdfb0df3c3"
+      sha256 "3ae395fad21ec128b9892b95753e970407aa1ce352953f530b0f8eb15cc7d9a3"
     else
       url "https://github.com/devenvoy/mconv/releases/download/v2.0.0/mconv-v2.0.0-macos-x86_64.tar.gz"
       sha256 "87191463de508ad5d2891a585a1b9eb3b8a4705cf796e55bef10c700a015a569"
