@@ -61,12 +61,12 @@ pub fn format_size(bytes: u64) -> String {
     }
 }
 
-pub fn get_available_disk_space(path: &Path) -> Option<u64> {
+pub fn get_available_disk_space(_path: &Path) -> Option<u64> {
     #[cfg(unix)]
     {
         use std::ffi::CString;
         use std::os::unix::ffi::OsStrExt;
-        let c_path = CString::new(path.as_os_str().as_bytes()).ok()?;
+        let c_path = CString::new(_path.as_os_str().as_bytes()).ok()?;
         let mut stat: libc::statvfs = unsafe { std::mem::zeroed() };
         if unsafe { libc::statvfs(c_path.as_ptr(), &mut stat) } == 0 {
             Some(stat.f_bavail as u64 * stat.f_frsize as u64)
