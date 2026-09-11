@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="40%" stop-color="#818cf8" />
+      <stop offset="80%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#f472b6" />
+    </linearGradient>
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Card -->
+  <rect x="2" y="2" width="896" height="236" rx="16" fill="url(#bg-grad)" stroke="url(#border-grad)" stroke-width="2" />
+
+  <!-- Accent Top Line -->
+  <rect x="2" y="2" width="896" height="4" rx="2" fill="url(#accent-grad)" />
+
+  <!-- Logo Group -->
+  <g transform="translate(48, 55)">
+    <rect x="0" y="0" width="130" height="130" rx="26" fill="#1e293b" stroke="url(#accent-grad)" stroke-width="2.5" />
+    <!-- Waveform & Arrows -->
+    <rect x="24" y="48" width="8" height="34" rx="4" fill="#38bdf8" />
+    <rect x="36" y="36" width="8" height="58" rx="4" fill="#818cf8" />
+    <rect x="48" y="52" width="8" height="26" rx="4" fill="#a78bfa" />
+    <path d="M 68 50 L 96 50 L 87 41" fill="none" stroke="#34d399" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 96 80 L 68 80 L 77 89" fill="none" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="102" cy="65" r="5" fill="#34d399" />
+  </g>
+
+  <!-- Title & Subtitle -->
+  <text x="210" y="105" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="46" font-weight="800" fill="url(#accent-grad)" letter-spacing="-0.5">mconv</text>
+  <text x="365" y="90" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="1">V2.0 STABLE</text>
+  <rect x="360" y="74" width="90" height="22" rx="6" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-opacity="0.4" stroke-width="1" />
+
+  <text x="212" y="142" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">Interactive High-Performance TUI Media Converter</text>
+  <text x="212" y="168" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#64748b">Powered by Rust &amp; FFmpeg • Fast Remux Engine • Hardware Accelerated • Zero Data Loss</text>
+
+  <!-- Pills on right -->
+  <g transform="translate(680, 55)">
+    <rect x="0" y="0" width="165" height="34" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="14" y="22" font-family="ui-monospace, monospace" font-size="12" font-weight="600" fill="#38bdf8">&gt; brew install mconv</text>
+
+    <rect x="0" y="44" width="165" height="34" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="14" y="66" font-family="ui-monospace, monospace" font-size="12" font-weight="600" fill="#34d399">Binary: 608 KB</text>
+
+    <rect x="0" y="88" width="165" height="34" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+    <text x="14" y="110" font-family="ui-monospace, monospace" font-size="12" font-weight="600" fill="#a78bfa">Apache-2.0 License</text>
+  </g>
+</svg>

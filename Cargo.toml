@@ -1,0 +1,24 @@
+[package]
+name = "mconv"
+version = "2.0.0"
+edition = "2021"
+description = "Interactive TUI media converter powered by FFmpeg"
+authors = ["mconv contributors"]
+
+[dependencies]
+crossterm = "0.28"
+indicatif = "0.17"
+rayon = "1.10"
+colored = "2.1"
+libc = "0.2"
+
+[[bin]]
+name = "mconv"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
