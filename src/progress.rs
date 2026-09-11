@@ -11,6 +11,12 @@ pub struct ConversionStats {
     pub start_time: Instant,
 }
 
+impl Default for ConversionStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ConversionStats {
     pub fn new() -> Self {
         Self {

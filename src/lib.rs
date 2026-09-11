@@ -1,3 +1,5 @@
+#![allow(clippy::needless_borrows_for_generic_args)]
+
 pub mod converter;
 pub mod formats;
 pub mod logger;

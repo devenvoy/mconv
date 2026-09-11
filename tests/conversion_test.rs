@@ -1,3 +1,5 @@
+#![allow(clippy::needless_borrows_for_generic_args)]
+
 use mconv::converter::{run_conversion, ConversionConfig};
 use mconv::formats::{get_category, get_targets_for_category, MediaCategory};
 use mconv::logger::Logger;
@@ -17,22 +19,54 @@ fn ensure_test_fixtures(dir: &Path) {
 
     if !audio1.exists() {
         let _ = Command::new("ffmpeg")
-            .args(&["-y", "-f", "lavfi", "-i", "sine=frequency=1000:duration=1", audio1.to_str().unwrap()])
+            .args(&[
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=1000:duration=1",
+                audio1.to_str().unwrap(),
+            ])
             .output();
     }
     if !audio2.exists() {
         let _ = Command::new("ffmpeg")
-            .args(&["-y", "-f", "lavfi", "-i", "sine=frequency=800:duration=1", audio2.to_str().unwrap()])
+            .args(&[
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=frequency=800:duration=1",
+                audio2.to_str().unwrap(),
+            ])
             .output();
     }
     if !video1.exists() {
         let _ = Command::new("ffmpeg")
-            .args(&["-y", "-f", "lavfi", "-i", "testsrc=size=320x240:rate=10", "-t", "1", video1.to_str().unwrap()])
+            .args(&[
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc=size=320x240:rate=10",
+                "-t",
+                "1",
+                video1.to_str().unwrap(),
+            ])
             .output();
     }
     if !img1.exists() {
         let _ = Command::new("ffmpeg")
-            .args(&["-y", "-f", "lavfi", "-i", "color=c=blue:s=320x240", "-frames:v", "1", img1.to_str().unwrap()])
+            .args(&[
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=c=blue:s=320x240",
+                "-frames:v",
+                "1",
+                img1.to_str().unwrap(),
+            ])
             .output();
     }
 }
@@ -59,7 +93,7 @@ fn test_directory_scanning() {
     ensure_test_fixtures(&test_dir);
 
     let stats = scan_extensions(&test_dir, false);
-    
+
     let wav_stat = stats.iter().find(|s| s.ext == "wav");
     assert!(wav_stat.is_some());
     assert_eq!(wav_stat.unwrap().count, 2);
@@ -91,7 +125,8 @@ fn test_audio_conversion_and_skip_safety() {
     let mp3_2 = test_dir.join("audio2.mp3");
 
     // Run conversion
-    let (converted, skipped, failed, _elapsed) = run_conversion(&wav_files, &config, Arc::clone(&logger));
+    let (converted, skipped, failed, _elapsed) =
+        run_conversion(&wav_files, &config, Arc::clone(&logger));
     assert_eq!(converted, 2);
     assert_eq!(skipped, 0);
     assert_eq!(failed, 0);
@@ -102,7 +137,8 @@ fn test_audio_conversion_and_skip_safety() {
     assert!(fs::metadata(&mp3_2).unwrap().len() > 0);
 
     // Second run: should SKIP both files because targets already exist!
-    let (converted2, skipped2, failed2, _elapsed2) = run_conversion(&wav_files, &config, Arc::clone(&logger));
+    let (converted2, skipped2, failed2, _elapsed2) =
+        run_conversion(&wav_files, &config, Arc::clone(&logger));
     assert_eq!(converted2, 0);
     assert_eq!(skipped2, 2);
     assert_eq!(failed2, 0);
@@ -171,7 +207,16 @@ fn test_parallel_video_multiprogress() {
     for i in 1..=3 {
         let f = test_dir.join(format!("vid_{}.mp4", i));
         let _ = Command::new("ffmpeg")
-            .args(&["-y", "-f", "lavfi", "-i", "testsrc=size=320x240:rate=25", "-t", "2", f.to_str().unwrap()])
+            .args(&[
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc=size=320x240:rate=25",
+                "-t",
+                "2",
+                f.to_str().unwrap(),
+            ])
             .output();
         files.push(f);
     }

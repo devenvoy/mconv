@@ -8,13 +8,23 @@ pub struct Logger {
     file: Mutex<Option<File>>,
 }
 
+impl Default for Logger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Logger {
     pub fn new() -> Self {
         let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
         let log_dir = Path::new(&home).join(".mconv").join("logs");
         let _ = create_dir_all(&log_dir);
 
-        let filename = format!("mconv_{}_{}.log", current_timestamp_str(), std::process::id());
+        let filename = format!(
+            "mconv_{}_{}.log",
+            current_timestamp_str(),
+            std::process::id()
+        );
         let log_path = log_dir.join(filename);
 
         let file = OpenOptions::new()

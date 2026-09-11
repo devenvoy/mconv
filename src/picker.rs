@@ -4,7 +4,8 @@ use std::process::Command;
 pub fn pick_folder_native() -> Option<PathBuf> {
     #[cfg(target_os = "macos")]
     {
-        let script = r#"POSIX path of (choose folder with prompt "Select media folder for mconv:")"#;
+        let script =
+            r#"POSIX path of (choose folder with prompt "Select media folder for mconv:")"#;
         let output = Command::new("osascript")
             .arg("-e")
             .arg(script)
@@ -20,13 +21,17 @@ pub fn pick_folder_native() -> Option<PathBuf> {
                 }
             }
         }
-        return None;
+        None
     }
 
     #[cfg(target_os = "linux")]
     {
         if let Ok(output) = Command::new("zenity")
-            .args(&["--file-selection", "--directory", "--title=Select media folder for mconv"])
+            .args(&[
+                "--file-selection",
+                "--directory",
+                "--title=Select media folder for mconv",
+            ])
             .output()
         {
             if output.status.success() {

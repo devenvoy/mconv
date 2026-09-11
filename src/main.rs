@@ -1,3 +1,5 @@
+#![allow(clippy::needless_borrows_for_generic_args)]
+
 use colored::*;
 use mconv::converter::{check_ffmpeg, run_conversion, ConversionConfig};
 use mconv::formats::{get_category, get_targets_for_category, MediaCategory};
@@ -19,7 +21,10 @@ fn main() {
     if args.len() > 1 {
         match args[1].as_str() {
             "-h" | "--help" => {
-                println!("mconv v{} - Interactive High-Performance Media Converter", VERSION);
+                println!(
+                    "mconv v{} - Interactive High-Performance Media Converter",
+                    VERSION
+                );
                 println!();
                 println!("USAGE:");
                 println!("    mconv                Launch interactive terminal interface");
@@ -37,7 +42,13 @@ fn main() {
 
     if !check_ffmpeg() {
         eprintln!();
-        eprintln!("  {} {}", "✖".bright_red().bold(), "ffmpeg is required but was not found in PATH!".bright_red().bold());
+        eprintln!(
+            "  {} {}",
+            "✖".bright_red().bold(),
+            "ffmpeg is required but was not found in PATH!"
+                .bright_red()
+                .bold()
+        );
         eprintln!("  {} Please install ffmpeg:", "│".dimmed());
         eprintln!("  {}   macOS:  brew install ffmpeg", "│".dimmed());
         eprintln!("  {}   Ubuntu: sudo apt-get install ffmpeg", "│".dimmed());
@@ -52,9 +63,18 @@ fn main() {
         print_banner();
 
         let menu_options = vec![
-            PromptOption::with_hint("Convert files in a folder", "Batch convert audio, video, images, or subtitles"),
-            PromptOption::with_hint("Find files by extension", "Search and index files in a folder"),
-            PromptOption::with_hint("View audit log", "Inspect current or previous conversion logs"),
+            PromptOption::with_hint(
+                "Convert files in a folder",
+                "Batch convert audio, video, images, or subtitles",
+            ),
+            PromptOption::with_hint(
+                "Find files by extension",
+                "Search and index files in a folder",
+            ),
+            PromptOption::with_hint(
+                "View audit log",
+                "Inspect current or previous conversion logs",
+            ),
             PromptOption::with_hint("Exit", "Quit mconv"),
         ];
 
@@ -71,7 +91,11 @@ fn main() {
             Some(2) => flow_view_log(&logger),
             _ => {
                 println!();
-                println!("  {} {}", "✔".bright_green().bold(), "Goodbye!".bright_white().bold());
+                println!(
+                    "  {} {}",
+                    "✔".bright_green().bold(),
+                    "Goodbye!".bright_white().bold()
+                );
                 println!();
                 break;
             }
@@ -85,10 +109,22 @@ fn select_folder_flow() -> Option<PathBuf> {
 
     loop {
         let picker_options = vec![
-            PromptOption::with_hint("[OS]   Open Native OS Folder Picker", "Choose directory with macOS Finder / OS dialog"),
-            PromptOption::with_hint(format!("[DIR]  Current Directory ({})", cur_str), "Use the current working directory"),
-            PromptOption::with_hint("[PATH] Enter / Paste Path Manually", "Type a custom folder path"),
-            PromptOption::with_hint("[TREE] Browse Folder Tree", "Explore subdirectories directly in terminal"),
+            PromptOption::with_hint(
+                "[OS]   Open Native OS Folder Picker",
+                "Choose directory with macOS Finder / OS dialog",
+            ),
+            PromptOption::with_hint(
+                format!("[DIR]  Current Directory ({})", cur_str),
+                "Use the current working directory",
+            ),
+            PromptOption::with_hint(
+                "[PATH] Enter / Paste Path Manually",
+                "Type a custom folder path",
+            ),
+            PromptOption::with_hint(
+                "[TREE] Browse Folder Tree",
+                "Explore subdirectories directly in terminal",
+            ),
         ];
 
         let choice = select_option(
@@ -100,13 +136,26 @@ fn select_folder_flow() -> Option<PathBuf> {
 
         match choice {
             0 => {
-                println!("  {}  {}", "│".dimmed(), "Opening native OS file dialog...".cyan());
+                println!(
+                    "  {}  {}",
+                    "│".dimmed(),
+                    "Opening native OS file dialog...".cyan()
+                );
                 if let Some(folder) = pick_folder_native() {
-                    println!("  {}  {} {}", "◇".bright_green().bold(), "OS Folder selected:".dimmed(), folder.display().to_string().bright_white().bold());
+                    println!(
+                        "  {}  {} {}",
+                        "◇".bright_green().bold(),
+                        "OS Folder selected:".dimmed(),
+                        folder.display().to_string().bright_white().bold()
+                    );
                     println!("  {}", "│".dimmed());
                     return Some(folder);
                 } else {
-                    println!("  {}  {}", "│".dimmed(), "Native folder picker was cancelled or closed.".yellow());
+                    println!(
+                        "  {}  {}",
+                        "│".dimmed(),
+                        "Native folder picker was cancelled or closed.".yellow()
+                    );
                     println!("  {}", "│".dimmed());
                     continue;
                 }
@@ -118,7 +167,12 @@ fn select_folder_flow() -> Option<PathBuf> {
                     if path.is_dir() {
                         return Some(path);
                     } else {
-                        println!("  {}  {} {}", "✖".bright_red().bold(), "Not a valid directory:".red(), path.display());
+                        println!(
+                            "  {}  {} {}",
+                            "✖".bright_red().bold(),
+                            "Not a valid directory:".red(),
+                            path.display()
+                        );
                         println!("  {}", "│".dimmed());
                     }
                 }
@@ -144,7 +198,11 @@ fn browse_folders_tui(start: &Path) -> Option<PathBuf> {
         ];
 
         for d in &subdirs {
-            let name = d.file_name().unwrap_or_default().to_string_lossy().to_string();
+            let name = d
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string();
             opts.push(PromptOption::new(format!("[DIR] {}", name)));
         }
 
@@ -177,20 +235,34 @@ fn flow_convert(logger: &Arc<Logger>) {
     };
 
     let recurse_opts = vec![
-        PromptOption::with_hint("No  (top-level folder only)", "Fastest, does not inspect subfolders"),
-        PromptOption::with_hint("Yes (scan recursively)", "Includes files inside all nested subdirectories"),
+        PromptOption::with_hint(
+            "No  (top-level folder only)",
+            "Fastest, does not inspect subfolders",
+        ),
+        PromptOption::with_hint(
+            "Yes (scan recursively)",
+            "Includes files inside all nested subdirectories",
+        ),
     ];
     let rec_choice = match select_option("Include subfolders?", None, &recurse_opts, 0) {
         Some(c) => c == 1,
         None => return,
     };
 
-    println!("  {}  {}", "│".dimmed(), "Scanning folder for media files...".dimmed());
+    println!(
+        "  {}  {}",
+        "│".dimmed(),
+        "Scanning folder for media files...".dimmed()
+    );
     let ext_stats = scan_extensions(&target_dir, rec_choice);
 
     if ext_stats.is_empty() {
         println!();
-        println!("  {}  {}", "✖".bright_red().bold(), "No files found in selected directory.".bright_red().bold());
+        println!(
+            "  {}  {}",
+            "✖".bright_red().bold(),
+            "No files found in selected directory.".bright_red().bold()
+        );
         println!("  {}", "│".dimmed());
         return;
     }
@@ -238,7 +310,11 @@ fn flow_convert(logger: &Arc<Logger>) {
     let target_formats = get_targets_for_category(category, from_ext);
     if target_formats.is_empty() {
         println!();
-        println!("  {}  No available target formats for .{}", "✖".bright_red().bold(), from_ext);
+        println!(
+            "  {}  No available target formats for .{}",
+            "✖".bright_red().bold(),
+            from_ext
+        );
         println!("  {}", "│".dimmed());
         return;
     }
@@ -247,13 +323,21 @@ fn flow_convert(logger: &Arc<Logger>) {
         .iter()
         .map(|&t| match t {
             "mp4" => PromptOption::with_hint(".mp4", "Universal H.264 + AAC, high compatibility"),
-            "mkv" => PromptOption::with_hint(".mkv", "Matroska container with full metadata support"),
-            "webm" => PromptOption::with_hint(".webm", "VP9 + Opus for high efficiency web streaming"),
-            "gif" => PromptOption::with_hint(".gif", "High quality animated GIF with Lanczos scaling"),
+            "mkv" => {
+                PromptOption::with_hint(".mkv", "Matroska container with full metadata support")
+            }
+            "webm" => {
+                PromptOption::with_hint(".webm", "VP9 + Opus for high efficiency web streaming")
+            }
+            "gif" => {
+                PromptOption::with_hint(".gif", "High quality animated GIF with Lanczos scaling")
+            }
             "mp3" => PromptOption::with_hint(".mp3", "Universal MP3 audio (LAME VBR Q2)"),
             "flac" => PromptOption::with_hint(".flac", "Lossless audio compression"),
             "wav" => PromptOption::with_hint(".wav", "Uncompressed PCM audio"),
-            "aac" | "m4a" => PromptOption::with_hint(format!(".{}", t), "Advanced Audio Coding (192kbps)"),
+            "aac" | "m4a" => {
+                PromptOption::with_hint(format!(".{}", t), "Advanced Audio Coding (192kbps)")
+            }
             "webp" => PromptOption::with_hint(".webp", "High compression web image format"),
             "png" => PromptOption::with_hint(".png", "Lossless image format"),
             "jpg" => PromptOption::with_hint(".jpg", "High quality JPEG image"),
@@ -274,13 +358,21 @@ fn flow_convert(logger: &Arc<Logger>) {
     let to_ext = target_formats[to_idx].to_string();
 
     let del_options = vec![
-        PromptOption::with_hint("No  - Keep original files", "Safest: originals remain untouched alongside new files"),
-        PromptOption::with_hint("Yes - Delete originals after successful conversion", "Only deletes after output is verified non-empty"),
+        PromptOption::with_hint(
+            "No  - Keep original files",
+            "Safest: originals remain untouched alongside new files",
+        ),
+        PromptOption::with_hint(
+            "Yes - Delete originals after successful conversion",
+            "Only deletes after output is verified non-empty",
+        ),
     ];
 
     let delete_originals = match select_option(
         "Delete originals after converting?",
-        Some("Safety guarantee: original file is NEVER deleted if conversion fails or target exists"),
+        Some(
+            "Safety guarantee: original file is NEVER deleted if conversion fails or target exists",
+        ),
         &del_options,
         0,
     ) {
@@ -291,7 +383,11 @@ fn flow_convert(logger: &Arc<Logger>) {
     let files_to_convert = find_matching_files(&target_dir, from_ext, rec_choice);
     if files_to_convert.is_empty() {
         println!();
-        println!("  {}  No matching .{} files found to convert.", "✖".bright_red().bold(), from_ext);
+        println!(
+            "  {}  No matching .{} files found to convert.",
+            "✖".bright_red().bold(),
+            from_ext
+        );
         println!("  {}", "│".dimmed());
         return;
     }
@@ -400,7 +496,11 @@ fn flow_convert(logger: &Arc<Logger>) {
     );
 
     if confirm != Some(true) {
-        println!("  {}  {}", "ℹ".bright_yellow().bold(), "Conversion cancelled. No files were modified.".yellow());
+        println!(
+            "  {}  {}",
+            "ℹ".bright_yellow().bold(),
+            "Conversion cancelled. No files were modified.".yellow()
+        );
         println!("  {}", "│".dimmed());
         return;
     }
@@ -412,7 +512,10 @@ fn flow_convert(logger: &Arc<Logger>) {
         files_to_convert.len().to_string().bold().bright_white(),
         workers_choice.to_string().bold().bright_cyan()
     );
-    println!("  {}", "──────────────────────────────────────────────────────────────".dimmed());
+    println!(
+        "  {}",
+        "──────────────────────────────────────────────────────────────".dimmed()
+    );
 
     let config = ConversionConfig {
         to_ext,
@@ -421,16 +524,40 @@ fn flow_convert(logger: &Arc<Logger>) {
         workers: workers_choice,
     };
 
-    let (converted, skipped, failed, elapsed) = run_conversion(&files_to_convert, &config, Arc::clone(logger));
+    let (converted, skipped, failed, elapsed) =
+        run_conversion(&files_to_convert, &config, Arc::clone(logger));
 
-    println!("  {}", "──────────────────────────────────────────────────────────────".dimmed());
+    println!(
+        "  {}",
+        "──────────────────────────────────────────────────────────────".dimmed()
+    );
     println!();
-    println!("  {} {}", "✔".bright_green().bold(), "Batch processing complete!".bold().bright_white());
-    println!("  {}  Converted:  {}", "│".dimmed(), converted.to_string().bold().bright_green());
-    println!("  {}  Skipped:    {}", "│".dimmed(), skipped.to_string().bold().bright_yellow());
-    println!("  {}  Failed:     {}", "│".dimmed(), failed.to_string().bold().bright_red());
+    println!(
+        "  {} {}",
+        "✔".bright_green().bold(),
+        "Batch processing complete!".bold().bright_white()
+    );
+    println!(
+        "  {}  Converted:  {}",
+        "│".dimmed(),
+        converted.to_string().bold().bright_green()
+    );
+    println!(
+        "  {}  Skipped:    {}",
+        "│".dimmed(),
+        skipped.to_string().bold().bright_yellow()
+    );
+    println!(
+        "  {}  Failed:     {}",
+        "│".dimmed(),
+        failed.to_string().bold().bright_red()
+    );
     println!("  {}  Total Time: {:.1} seconds", "│".dimmed(), elapsed);
-    println!("  {}  Audit Log:  {}", "│".dimmed(), logger.path().display().to_string().dimmed());
+    println!(
+        "  {}  Audit Log:  {}",
+        "│".dimmed(),
+        logger.path().display().to_string().dimmed()
+    );
     println!();
 }
 
@@ -451,7 +578,10 @@ fn flow_find() {
 
     let ext_stats = scan_extensions(&target_dir, rec_choice);
     if ext_stats.is_empty() {
-        println!("  {}  No files found in directory.", "✖".bright_red().bold());
+        println!(
+            "  {}  No files found in directory.",
+            "✖".bright_red().bold()
+        );
         return;
     }
 
@@ -469,12 +599,21 @@ fn flow_find() {
     let matched = find_matching_files(&target_dir, ext, rec_choice);
 
     println!();
-    println!("  {} Found {} file(s) with extension .{}:", "✔".bright_green().bold(), matched.len(), ext);
+    println!(
+        "  {} Found {} file(s) with extension .{}:",
+        "✔".bright_green().bold(),
+        matched.len(),
+        ext
+    );
     for (i, file) in matched.iter().enumerate().take(30) {
         println!("  {}  {: >2}. {}", "│".dimmed(), i + 1, file.display());
     }
     if matched.len() > 30 {
-        println!("  {}  ... and {} more files", "│".dimmed(), matched.len() - 30);
+        println!(
+            "  {}  ... and {} more files",
+            "│".dimmed(),
+            matched.len() - 30
+        );
     }
     println!();
 }
@@ -486,7 +625,11 @@ fn flow_view_log(logger: &Logger) {
             println!();
             print_section_header("Audit Log Content", Some(&log_path.display().to_string()));
             let lines: Vec<&str> = content.lines().collect();
-            let start_idx = if lines.len() > 25 { lines.len() - 25 } else { 0 };
+            let start_idx = if lines.len() > 25 {
+                lines.len() - 25
+            } else {
+                0
+            };
             for line in &lines[start_idx..] {
                 println!("  {} {}", "│".dimmed(), line);
             }

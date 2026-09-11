@@ -28,16 +28,22 @@ pub fn check_ffmpeg() -> bool {
 pub fn get_media_duration(input: &Path) -> Option<f64> {
     let output = Command::new("ffprobe")
         .args(&[
-            "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
         ])
         .arg(input)
         .output()
         .ok()?;
 
     if output.status.success() {
-        String::from_utf8_lossy(&output.stdout).trim().parse::<f64>().ok()
+        String::from_utf8_lossy(&output.stdout)
+            .trim()
+            .parse::<f64>()
+            .ok()
     } else {
         None
     }
@@ -170,7 +176,11 @@ fn convert_single_file(
     reporter: &MultiProgressReporter,
 ) {
     let start = Instant::now();
-    let file_name = input.file_name().unwrap_or_default().to_string_lossy().to_string();
+    let file_name = input
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
     let short_name = truncate_filename(&file_name, 35);
 
     let pb = reporter.create_file_progress(&short_name);
@@ -184,14 +194,21 @@ fn convert_single_file(
     let meta = match fs::metadata(input) {
         Ok(m) => m,
         Err(e) => {
-            logger.fail(&format!("Cannot read metadata: {} ({})", input.display(), e));
+            logger.fail(&format!(
+                "Cannot read metadata: {} ({})",
+                input.display(),
+                e
+            ));
             reporter.complete_fail(pb, &short_name, "cannot read file");
             return;
         }
     };
 
     if meta.len() == 0 {
-        logger.fail(&format!("Corrupted/empty file (0 bytes): {}", input.display()));
+        logger.fail(&format!(
+            "Corrupted/empty file (0 bytes): {}",
+            input.display()
+        ));
         reporter.complete_fail(pb, &short_name, "empty file (0 bytes)");
         return;
     }
@@ -222,8 +239,12 @@ fn convert_single_file(
     let duration = get_media_duration(input);
 
     let (success, method, last_error) = match category {
-        MediaCategory::Video => convert_video_pipeline(input, &tmp_path, to_ext, &pb, &short_name, duration),
-        MediaCategory::Audio => convert_audio_pipeline(input, &tmp_path, to_ext, &pb, &short_name, duration),
+        MediaCategory::Video => {
+            convert_video_pipeline(input, &tmp_path, to_ext, &pb, &short_name, duration)
+        }
+        MediaCategory::Audio => {
+            convert_audio_pipeline(input, &tmp_path, to_ext, &pb, &short_name, duration)
+        }
         MediaCategory::Image => {
             let encode_args = get_encode_args(category, to_ext);
             let mut cmd = Command::new("ffmpeg");
@@ -256,7 +277,11 @@ fn convert_single_file(
         }
     };
 
-    let valid_output = success && tmp_path.exists() && fs::metadata(&tmp_path).map(|m| m.len() > 0).unwrap_or(false);
+    let valid_output = success
+        && tmp_path.exists()
+        && fs::metadata(&tmp_path)
+            .map(|m| m.len() > 0)
+            .unwrap_or(false);
 
     if valid_output {
         if fs::rename(&tmp_path, &target_path).is_ok() {
@@ -264,8 +289,21 @@ fn convert_single_file(
             let size = fs::metadata(&target_path).map(|m| m.len()).unwrap_or(0);
             let size_str = format_size(size);
 
-            logger.ok(&format!("{} -> {} ({:.1}s, {})", input.display(), target_path.display(), duration_secs, method));
-            reporter.complete_ok(pb, &short_name, &target_filename, duration_secs, &size_str, method);
+            logger.ok(&format!(
+                "{} -> {} ({:.1}s, {})",
+                input.display(),
+                target_path.display(),
+                duration_secs,
+                method
+            ));
+            reporter.complete_ok(
+                pb,
+                &short_name,
+                &target_filename,
+                duration_secs,
+                &size_str,
+                method,
+            );
 
             if delete_originals {
                 let _ = fs::remove_file(input);
@@ -273,14 +311,20 @@ fn convert_single_file(
             }
         } else {
             let _ = fs::remove_file(&tmp_path);
-            logger.fail(&format!("Atomic rename failed for: {}", target_path.display()));
+            logger.fail(&format!(
+                "Atomic rename failed for: {}",
+                target_path.display()
+            ));
             reporter.complete_fail(pb, &short_name, "rename failed (original safe)");
         }
     } else {
         let _ = fs::remove_file(&tmp_path);
         let _ = fs::remove_file(&target_path);
 
-        let err_display = if last_error.to_lowercase().contains("no space left on device") {
+        let err_display = if last_error
+            .to_lowercase()
+            .contains("no space left on device")
+        {
             "DISK FULL: No space left on device".to_string()
         } else if last_error.is_empty() {
             "conversion failed (reverted to original)".to_string()
@@ -288,7 +332,11 @@ fn convert_single_file(
             last_error
         };
 
-        logger.fail(&format!("Failed for: {} ({})", input.display(), err_display));
+        logger.fail(&format!(
+            "Failed for: {} ({})",
+            input.display(),
+            err_display
+        ));
         reporter.complete_fail(pb, &short_name, &err_display);
     }
 }
@@ -304,10 +352,15 @@ fn convert_video_pipeline(
     if to_ext == "gif" {
         let mut cmd = Command::new("ffmpeg");
         cmd.args(&[
-            "-y", "-nostdin",
-            "-i", &input.to_string_lossy(),
-            "-vf", "fps=10,scale=480:-1:flags=lanczos",
-            "-progress", "pipe:1", "-nostats",
+            "-y",
+            "-nostdin",
+            "-i",
+            &input.to_string_lossy(),
+            "-vf",
+            "fps=10,scale=480:-1:flags=lanczos",
+            "-progress",
+            "pipe:1",
+            "-nostats",
         ])
         .arg(tmp_path);
 
@@ -322,7 +375,9 @@ fn convert_video_pipeline(
     if to_ext == "mp4" {
         remux_cmd.args(&["-movflags", "+faststart"]);
     }
-    remux_cmd.args(&["-progress", "pipe:1", "-nostats"]).arg(tmp_path);
+    remux_cmd
+        .args(&["-progress", "pipe:1", "-nostats"])
+        .arg(tmp_path);
 
     let (remux_ok, remux_err) = run_ffmpeg_pipe(&mut remux_cmd, pb, short_name, duration);
     if remux_ok && is_valid_file(tmp_path) {
@@ -338,7 +393,9 @@ fn convert_video_pipeline(
     if to_ext == "mp4" {
         remux_v_cmd.args(&["-movflags", "+faststart"]);
     }
-    remux_v_cmd.args(&["-progress", "pipe:1", "-nostats"]).arg(tmp_path);
+    remux_v_cmd
+        .args(&["-progress", "pipe:1", "-nostats"])
+        .arg(tmp_path);
 
     let (remux_v_ok, _) = run_ffmpeg_pipe(&mut remux_v_cmd, pb, short_name, duration);
     if remux_v_ok && is_valid_file(tmp_path) {
@@ -348,24 +405,74 @@ fn convert_video_pipeline(
     let _ = fs::remove_file(tmp_path);
 
     let mut enc_cmd = Command::new("ffmpeg");
-    enc_cmd.arg("-y").arg("-nostdin").arg("-hwaccel").arg("auto").arg("-i").arg(input);
+    enc_cmd
+        .arg("-y")
+        .arg("-nostdin")
+        .arg("-hwaccel")
+        .arg("auto")
+        .arg("-i")
+        .arg(input);
     enc_cmd.args(&["-map", "0:v:0", "-map", "0:a?"]);
 
     let method = match detect_gpu_backend() {
         GpuBackend::AppleVideoToolbox if to_ext == "mp4" || to_ext == "mov" || to_ext == "mkv" => {
-            enc_cmd.args(&["-c:v", "h264_videotoolbox", "-b:v", "5M", "-c:a", "aac", "-b:a", "192k"]);
+            enc_cmd.args(&[
+                "-c:v",
+                "h264_videotoolbox",
+                "-b:v",
+                "5M",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+            ]);
             "Apple Silicon GPU (VideoToolbox)"
         }
         GpuBackend::NvidiaNvenc if to_ext == "mp4" || to_ext == "mov" || to_ext == "mkv" => {
-            enc_cmd.args(&["-c:v", "h264_nvenc", "-preset", "p4", "-cq", "22", "-c:a", "aac", "-b:a", "192k"]);
+            enc_cmd.args(&[
+                "-c:v",
+                "h264_nvenc",
+                "-preset",
+                "p4",
+                "-cq",
+                "22",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+            ]);
             "NVIDIA NVENC GPU"
         }
         GpuBackend::IntelQsv if to_ext == "mp4" || to_ext == "mov" || to_ext == "mkv" => {
-            enc_cmd.args(&["-c:v", "h264_qsv", "-global_quality", "22", "-c:a", "aac", "-b:a", "192k"]);
+            enc_cmd.args(&[
+                "-c:v",
+                "h264_qsv",
+                "-global_quality",
+                "22",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+            ]);
             "Intel QuickSync GPU"
         }
         _ if to_ext == "webm" => {
-            enc_cmd.args(&["-c:v", "libvpx-vp9", "-crf", "32", "-b:v", "0", "-deadline", "realtime", "-cpu-used", "4", "-c:a", "libopus", "-b:a", "128k"]);
+            enc_cmd.args(&[
+                "-c:v",
+                "libvpx-vp9",
+                "-crf",
+                "32",
+                "-b:v",
+                "0",
+                "-deadline",
+                "realtime",
+                "-cpu-used",
+                "4",
+                "-c:a",
+                "libopus",
+                "-b:a",
+                "128k",
+            ]);
             "VP9 webm encode"
         }
         _ => {
@@ -378,10 +485,16 @@ fn convert_video_pipeline(
     if to_ext == "mp4" {
         enc_cmd.args(&["-movflags", "+faststart"]);
     }
-    enc_cmd.args(&["-progress", "pipe:1", "-nostats"]).arg(tmp_path);
+    enc_cmd
+        .args(&["-progress", "pipe:1", "-nostats"])
+        .arg(tmp_path);
 
     let (enc_ok, enc_err) = run_ffmpeg_pipe(&mut enc_cmd, pb, short_name, duration);
-    let err = if enc_err.is_empty() { remux_err } else { enc_err };
+    let err = if enc_err.is_empty() {
+        remux_err
+    } else {
+        enc_err
+    };
     (enc_ok, method, err)
 }
 
@@ -428,7 +541,7 @@ fn run_ffmpeg_pipe(
         let mut lines = Vec::new();
         if let Some(pipe) = stderr {
             let reader = BufReader::new(pipe);
-            for line in reader.lines().flatten() {
+            for line in reader.lines().map_while(Result::ok) {
                 let t = line.trim().to_string();
                 if !t.is_empty() {
                     lines.push(t);
@@ -444,7 +557,7 @@ fn run_ffmpeg_pipe(
     if let Some(pipe) = stdout {
         let reader = BufReader::new(pipe);
 
-        for line in reader.lines().flatten() {
+        for line in reader.lines().map_while(Result::ok) {
             if let Some(rest) = line.strip_prefix("out_time_us=") {
                 if let Ok(us) = rest.trim().parse::<u64>() {
                     let current_secs = us as f64 / 1_000_000.0;
@@ -471,9 +584,19 @@ fn run_ffmpeg_pipe(
         err_lines
             .iter()
             .rev()
-            .find(|l| l.contains("Error") || l.contains("Invalid") || l.contains("failed") || l.contains("cannot"))
+            .find(|l| {
+                l.contains("Error")
+                    || l.contains("Invalid")
+                    || l.contains("failed")
+                    || l.contains("cannot")
+            })
             .cloned()
-            .unwrap_or_else(|| err_lines.last().cloned().unwrap_or_else(|| "unknown error".to_string()))
+            .unwrap_or_else(|| {
+                err_lines
+                    .last()
+                    .cloned()
+                    .unwrap_or_else(|| "unknown error".to_string())
+            })
     } else {
         String::new()
     };

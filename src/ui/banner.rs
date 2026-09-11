@@ -2,7 +2,7 @@ use colored::*;
 
 pub fn print_banner() {
     println!();
-    
+
     let banner_lines = [
         "  ███╗   ███╗ ██████╗ ██████╗ ███╗   ██╗██╗   ██╗",
         "  ████╗ ████║██╔════╝██╔═══██╗████╗  ██║██║   ██║",
@@ -13,12 +13,12 @@ pub fn print_banner() {
     ];
 
     let colors = [
-        (56, 189, 248),   // #38bdf8 sky blue
-        (96, 165, 250),   // #60a5fa light blue
-        (129, 140, 248),  // #818cf8 indigo
-        (167, 139, 250),  // #a78bfa purple
-        (192, 132, 252),  // #c084fc violet
-        (232, 121, 249),  // #e879f9 fuchsia
+        (56, 189, 248),  // #38bdf8 sky blue
+        (96, 165, 250),  // #60a5fa light blue
+        (129, 140, 248), // #818cf8 indigo
+        (167, 139, 250), // #a78bfa purple
+        (192, 132, 252), // #c084fc violet
+        (232, 121, 249), // #e879f9 fuchsia
     ];
 
     for (line, (r, g, b)) in banner_lines.iter().zip(colors.iter()) {
@@ -26,7 +26,7 @@ pub fn print_banner() {
     }
     println!();
 
-    let top    = "  ╭──────────────────────────────────────────────────────────────╮";
+    let top = "  ╭──────────────────────────────────────────────────────────────╮";
     let bottom = "  ╰──────────────────────────────────────────────────────────────╯";
     let border = "│";
 
@@ -52,7 +52,11 @@ pub fn print_banner() {
 
 pub fn print_section_header(title: &str, description: Option<&str>) {
     println!();
-    println!("  {} {}", "◆".bright_magenta().bold(), title.bold().bright_white());
+    println!(
+        "  {} {}",
+        "◆".bright_magenta().bold(),
+        title.bold().bright_white()
+    );
     if let Some(desc) = description {
         println!("  {} {}", "│".dimmed(), desc.dimmed());
     }

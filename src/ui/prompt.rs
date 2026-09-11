@@ -36,15 +36,23 @@ fn render_menu(
     prev_lines: u16,
 ) -> io::Result<u16> {
     let mut out = stdout().lock();
-    
+
     execute!(out, cursor::MoveToColumn(0))?;
     if prev_lines > 0 {
-        execute!(out, cursor::MoveUp(prev_lines), Clear(ClearType::FromCursorDown))?;
+        execute!(
+            out,
+            cursor::MoveUp(prev_lines),
+            Clear(ClearType::FromCursorDown)
+        )?;
     }
 
     let mut lines: u16 = 0;
 
-    let title_line = format!("  {}  {}", "◆".bright_magenta().bold(), title.bold().bright_white());
+    let title_line = format!(
+        "  {}  {}",
+        "◆".bright_magenta().bold(),
+        title.bold().bright_white()
+    );
     write!(out, "\r{}\r\n", title_line)?;
     lines += 1;
 
@@ -56,8 +64,16 @@ fn render_menu(
 
     for (idx, opt) in options.iter().enumerate() {
         let is_sel = idx == selected_idx;
-        let bullet = if is_sel { "●".bright_cyan().bold() } else { "○".dimmed() };
-        let arrow = if is_sel { "❯".bright_cyan().bold() } else { " ".normal() };
+        let bullet = if is_sel {
+            "●".bright_cyan().bold()
+        } else {
+            "○".dimmed()
+        };
+        let arrow = if is_sel {
+            "❯".bright_cyan().bold()
+        } else {
+            " ".normal()
+        };
 
         let label_colored = if is_sel {
             opt.label.bold().bright_cyan()
@@ -71,7 +87,14 @@ fn render_menu(
             String::new()
         };
 
-        let line = format!("  {}  {} {} {}{}", "│".dimmed(), arrow, bullet, label_colored, hint_str);
+        let line = format!(
+            "  {}  {} {} {}{}",
+            "│".dimmed(),
+            arrow,
+            bullet,
+            label_colored,
+            hint_str
+        );
         write!(out, "\r{}\r\n", line)?;
         lines += 1;
     }
@@ -99,10 +122,14 @@ pub fn select_option(
     terminal::enable_raw_mode().ok()?;
     execute!(stdout, cursor::Hide).ok()?;
 
-    let mut lines_rendered: u16 = render_menu(title, description, options, selected, 0).unwrap_or(0);
+    let mut lines_rendered: u16 =
+        render_menu(title, description, options, selected, 0).unwrap_or(0);
 
     let result = loop {
-        if let Ok(Event::Key(KeyEvent { code, modifiers, .. })) = event::read() {
+        if let Ok(Event::Key(KeyEvent {
+            code, modifiers, ..
+        })) = event::read()
+        {
             if modifiers.contains(KeyModifiers::CONTROL) && code == KeyCode::Char('c') {
                 break None;
             }
@@ -114,7 +141,9 @@ pub fn select_option(
                     } else {
                         selected = options.len() - 1;
                     }
-                    lines_rendered = render_menu(title, description, options, selected, lines_rendered).unwrap_or(lines_rendered);
+                    lines_rendered =
+                        render_menu(title, description, options, selected, lines_rendered)
+                            .unwrap_or(lines_rendered);
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
                     if selected + 1 < options.len() {
@@ -122,7 +151,9 @@ pub fn select_option(
                     } else {
                         selected = 0;
                     }
-                    lines_rendered = render_menu(title, description, options, selected, lines_rendered).unwrap_or(lines_rendered);
+                    lines_rendered =
+                        render_menu(title, description, options, selected, lines_rendered)
+                            .unwrap_or(lines_rendered);
                 }
                 KeyCode::Enter => {
                     break Some(selected);
@@ -141,18 +172,40 @@ pub fn select_option(
     if let Some(idx) = result {
         if lines_rendered > 0 {
             let mut out = stdout.lock();
-            let _ = execute!(out, cursor::MoveToColumn(0), cursor::MoveUp(lines_rendered), Clear(ClearType::FromCursorDown));
+            let _ = execute!(
+                out,
+                cursor::MoveToColumn(0),
+                cursor::MoveUp(lines_rendered),
+                Clear(ClearType::FromCursorDown)
+            );
             let check_icon = "◇".bright_green().bold();
             let chosen_label = options[idx].label.bright_white().bold();
-            let collapsed_title = format!("  {}  {} {} {}", check_icon, title.dimmed(), "›".dimmed(), chosen_label);
+            let collapsed_title = format!(
+                "  {}  {} {} {}",
+                check_icon,
+                title.dimmed(),
+                "›".dimmed(),
+                chosen_label
+            );
             let _ = write!(out, "\r{}\r\n", collapsed_title);
             let _ = write!(out, "\r  {}\r\n", "│".dimmed());
             let _ = out.flush();
         }
     } else if lines_rendered > 0 {
         let mut out = stdout.lock();
-        let _ = execute!(out, cursor::MoveToColumn(0), cursor::MoveUp(lines_rendered), Clear(ClearType::FromCursorDown));
-        let _ = write!(out, "\r  {}  {} {}\r\n", "✖".bright_red(), title.dimmed(), "› Cancelled".bright_red());
+        let _ = execute!(
+            out,
+            cursor::MoveToColumn(0),
+            cursor::MoveUp(lines_rendered),
+            Clear(ClearType::FromCursorDown)
+        );
+        let _ = write!(
+            out,
+            "\r  {}  {} {}\r\n",
+            "✖".bright_red(),
+            title.dimmed(),
+            "› Cancelled".bright_red()
+        );
         let _ = write!(out, "\r  {}\r\n", "│".dimmed());
         let _ = out.flush();
     }
@@ -160,11 +213,7 @@ pub fn select_option(
     result
 }
 
-pub fn select_yes_no(
-    title: &str,
-    description: Option<&str>,
-    default_yes: bool,
-) -> Option<bool> {
+pub fn select_yes_no(title: &str, description: Option<&str>, default_yes: bool) -> Option<bool> {
     let opts = vec![
         PromptOption::new("No  - Cancel or keep current state"),
         PromptOption::new("Yes - Proceed"),
@@ -178,7 +227,11 @@ pub fn input_text(
     description: Option<&str>,
     default_value: Option<&str>,
 ) -> Option<String> {
-    println!("  {}  {}", "◆".bright_magenta().bold(), title.bold().bright_white());
+    println!(
+        "  {}  {}",
+        "◆".bright_magenta().bold(),
+        title.bold().bright_white()
+    );
     if let Some(desc) = description {
         println!("  {}  {}", "│".dimmed(), desc.dimmed());
     }
@@ -204,7 +257,13 @@ pub fn input_text(
         trimmed
     };
 
-    println!("  {}  {} {} {}", "◇".bright_green().bold(), title.dimmed(), "›".dimmed(), final_val.bold().bright_white());
+    println!(
+        "  {}  {} {} {}",
+        "◇".bright_green().bold(),
+        title.dimmed(),
+        "›".dimmed(),
+        final_val.bold().bright_white()
+    );
     println!("  {}", "│".dimmed());
 
     Some(final_val)
