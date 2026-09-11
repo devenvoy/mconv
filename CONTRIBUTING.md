@@ -11,7 +11,7 @@ Thank you for your interest in contributing to `mconv`! We welcome contributions
 
 ### Clone & Build
 ```bash
-git clone https://github.com/mconv/mconv.git
+git clone https://github.com/devenvoy/mconv.git
 cd mconv
 
 # Check compilation

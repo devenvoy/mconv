@@ -4,11 +4,11 @@
 
 <br/>
 
-[![CI](https://github.com/mconv/mconv/actions/workflows/ci.yml/badge.svg)](https://github.com/mconv/mconv/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/mconv/mconv?color=blue)](https://github.com/mconv/mconv/releases)
+[![CI](https://github.com/devenvoy/mconv/actions/workflows/ci.yml/badge.svg)](https://github.com/devenvoy/mconv/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/devenvoy/mconv?color=blue)](https://github.com/devenvoy/mconv/releases)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Binary Size](https://img.shields.io/badge/binary_size-608_KB-34d399)](dist/mconv)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-slate)](https://github.com/mconv/mconv)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-slate)](https://github.com/devenvoy/mconv)
 
 <p align="center">
   A blazing-fast, interactive terminal media converter written in <b>Rust</b> with a Vite-inspired TUI,<br/>
@@ -55,19 +55,19 @@
 
 ```bash
 # Tap repository and install mconv
-brew tap mconv/mconv
+brew tap devenvoy/mconv
 brew install mconv
 ```
 
 ### Method 2: Cargo (from Git or Crates.io)
 
 ```bash
-cargo install --git https://github.com/mconv/mconv.git
+cargo install --git https://github.com/devenvoy/mconv.git
 ```
 
 ### Method 3: Pre-built Standalone Binaries
 
-Download pre-compiled standalone executables for your architecture from the [GitHub Releases](https://github.com/mconv/mconv/releases) page:
+Download pre-compiled standalone executables for your architecture from the [GitHub Releases](https://github.com/devenvoy/mconv/releases) page:
 - **macOS Apple Silicon**: `mconv-aarch64-apple-darwin.tar.gz`
 - **macOS Intel**: `mconv-x86_64-apple-darwin.tar.gz`
 - **Linux (x86_64)**: `mconv-x86_64-unknown-linux-gnu.tar.gz`
@@ -82,7 +82,7 @@ sudo mv mconv /usr/local/bin/
 
 ```bash
 # Clone repository
-git clone https://github.com/mconv/mconv.git
+git clone https://github.com/devenvoy/mconv.git
 cd mconv
 
 # Compile optimized release executable

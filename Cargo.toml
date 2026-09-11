@@ -4,6 +4,10 @@ version = "2.0.0"
 edition = "2021"
 description = "Interactive TUI media converter powered by FFmpeg"
 authors = ["mconv contributors"]
+license = "Apache-2.0"
+repository = "https://github.com/devenvoy/mconv"
+homepage = "https://github.com/devenvoy/mconv"
+readme = "README.md"
 
 [dependencies]
 crossterm = "0.28"
